@@ -348,7 +348,14 @@ public class ItemRenderer
                         break;
 
                     case BLOCK:
-                        this.transformFirstPersonItem(f, 0.0F);
+                    	com.tornhost.tornclient.mods.Mod oldAnim = com.tornhost.tornclient.Client.getInstance().modManager.getModByName("1.7 Animations");
+                    	
+                    	if (oldAnim != null && oldAnim.isEnabled()) {
+                    		this.transformFirstPersonItem(f, f1);
+                    	} else {
+                    		this.transformFirstPersonItem(f, 0.0F);
+                    	}
+                    	
                         this.func_178103_d();
                         break;
 

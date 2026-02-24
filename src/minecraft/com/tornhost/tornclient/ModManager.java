@@ -15,6 +15,7 @@ public class ModManager {
 		mods.add(new com.tornhost.tornclient.mods.FullBright());
 		mods.add(new com.tornhost.tornclient.mods.Zoom());
 		mods.add(new com.tornhost.tornclient.mods.FPS());
+		mods.add(new com.tornhost.tornclient.mods.OldAnimations());
 	}
 	
 	// Returns the full list of mods
