@@ -22,7 +22,7 @@ jobs:
         run: chmod +x *.sh || true
 
       - name: Compile
-        run: ./recompile.sh
+        run: python -m runtime.recompile
 
       - name: Reobfuscate
         run: ./reobfuscate.sh
