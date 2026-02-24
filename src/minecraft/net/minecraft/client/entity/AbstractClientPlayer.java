@@ -89,7 +89,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer
             }
             
         } else {
-            com.tornhost.tornclient.Client.getInstance().cosmeticManager.fetchCosmetics(uuid);
+        	com.tornhost.tornclient.Client.getInstance().cosmeticManager.fetchCosmetics(uuid);
         }
         
         return this.playerInfo == null ? null : this.playerInfo.getLocationCape();

@@ -12,6 +12,8 @@ public class Mod {
 	
 	public float sliderX = 0.0F;
 	
+	public boolean isCosmetic = false;
+	
 	public Mod (String name, String description) {
 		this.name = name;
 		this.description = description;

@@ -48,6 +48,7 @@ public class GuiConnecting extends GuiScreen
     private void connect(final String ip, final int port)
     {
         logger.info("Connecting to " + ip + ", " + port);
+        com.tornhost.tornclient.Client.getInstance().discordManager.update("Connecting...", ip);
         (new Thread("Server Connector #" + CONNECTION_ID.incrementAndGet())
         {
             public void run()

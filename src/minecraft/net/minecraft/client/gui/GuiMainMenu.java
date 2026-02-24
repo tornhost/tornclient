@@ -225,6 +225,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         }
 
         this.mc.func_181537_a(false);
+        com.tornhost.tornclient.Client.getInstance().discordManager.update("In the Main Menu", "Idle");
     }
 
     /**

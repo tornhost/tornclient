@@ -190,6 +190,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation locationMojangPng = new ResourceLocation("textures/gui/title/mojang.png");
     public static final boolean isRunningOnMac = Util.getOSType() == Util.EnumOS.OSX;
+    private com.tornhost.tornclient.Client tornClient = com.tornhost.tornclient.Client.getInstance();
 
     /** A 10MiB preallocation to ensure the heap is reasonably sized. */
     public static byte[] memoryReserve = new byte[10485760];
@@ -2338,6 +2339,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     public void loadWorld(WorldClient worldClientIn)
     {
         this.loadWorld(worldClientIn, "");
+        
+        if (tornClient.discordManager != null) {
+            tornClient.discordManager.updateStatus(this);
+        }
     }
 
     /**
