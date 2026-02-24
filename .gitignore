@@ -1,0 +1,8 @@
+bin/
+jars/
+temp/
+reobf/
+logs/
+*.bat
+*.sh
+.metadata/
