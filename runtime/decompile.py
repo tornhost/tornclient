@@ -10,9 +10,9 @@ import sys
 import logging
 from optparse import OptionParser
 
-from commands import Commands, CLIENT, SERVER, CalledProcessError
-from mcp import decompile_side, updatemd5_side
-import clientCopy
+from .commands import Commands, CLIENT, SERVER, CalledProcessError
+from .mcp import decompile_side, updatemd5_side
+from . import clientCopy
 
 
 def main():

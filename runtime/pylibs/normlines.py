@@ -57,10 +57,10 @@ def main():
         in_name = args[0]
         out_name = args[1]
     else:
-        print >> sys.stderr, 'src_file or src_dir required'
+        print('src_file or src_dir required', file=sys.stderr)
         sys.exit(1)
     if not os.path.exists(in_name):
-        print >> sys.stderr, 'src_file or src_dir not found'
+        print('src_file or src_dir not found', file=sys.stderr)
         sys.exit(1)
     if os.path.isfile(in_name):
         normaliselines(in_name, out_name)

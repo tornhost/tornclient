@@ -11,7 +11,7 @@ import logging
 import json
 from optparse import OptionParser
 
-from commands import Commands, SERVER
+from .commands import Commands, SERVER
 
 
 def main():

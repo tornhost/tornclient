@@ -8,7 +8,7 @@ Created on Fri Apr  8 13:44:42 2011
 
 import csv
 
-import srgshandler
+from . import srgshandler
 
 
 CLIENT = 0

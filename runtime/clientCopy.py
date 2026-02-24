@@ -6,8 +6,8 @@ Created on Jun 30, 2013
 import os, sys
 import shutil
 import zipfile
-from commands import Commands
-import MinecraftDiscovery
+from .commands import Commands
+from . import MinecraftDiscovery
 
 def copyAssets(src, dst):
     
@@ -31,7 +31,7 @@ def copyLibrary(src, dst, library):
         
         shutil.copy2(os.path.join(src, library['filename']), dstPath)
     except:
-        print ("Error copying library %s"%library['name'])
+        print(("Error copying library %s"%library['name']))
         sys.exit()
 
 #def extractLibrary(src, dst, library, version):
@@ -70,7 +70,7 @@ def extractNative(root, name, jarname, version):
         jarFile = zipfile.ZipFile(srcPath)
         jarFile.extract(name, dstPath)
     except:
-        print ("Error extracting native %s from %s"%(name, jarname))
+        print(("Error extracting native %s from %s"%(name, jarname)))
         sys.exit()
 
 def copyMinecraft(src, dst, version):
@@ -86,7 +86,7 @@ def copyMinecraft(src, dst, version):
         shutil.copy2(jarSrcPath, dstPath)
         shutil.copy2(jsonSrcPath, dstPath)
     except Exception as e:
-        print ("\nError while copying Minecraft : %s"%e)
+        print(("\nError while copying Minecraft : %s"%e))
         sys.exit()    
 
 #########################################################################################################
@@ -113,38 +113,38 @@ def copyClientAssets(commands, workDir = None):
     #versionDir   = os.path.join(mcDir, "versions")
     #librariesDir = os.path.join(mcDir, "libraries")
 
-    print("Looking in %s for mc installs..."%os.path.join(mcDir, "versions")),
+    print(("Looking in %s for mc installs..."%os.path.join(mcDir, "versions")), end=' ')
     MinecraftDiscovery.checkMCDir(mcDir, currentVersion)
     print("OK")
 
-    print("Copying assets..."),
+    print(("Copying assets..."), end=' ')
     copyAssets(os.path.join(mcDir, "assets"), os.path.join(dstDir, "assets"))
     print("OK")
 
-    print("Parsing JSON file..."),
+    print(("Parsing JSON file..."), end=' ')
     mcLibraries = MinecraftDiscovery.getLibraries(mcDir, MinecraftDiscovery.getJSONFilename(mcDir, currentVersion), osKeyword)
     print("OK")
 
-    print ("Looking for minecraft main jar..."),
+    print(("Looking for minecraft main jar..."), end=' ')
     if (MinecraftDiscovery.checkMinecraftExists(dstDir, currentVersion)):
         print ("OK")
     else:
         print ("Not found")
-        print ("Copying minecraft main jar..."),
+        print(("Copying minecraft main jar..."), end=' ')
         copyMinecraft(mcDir, dstDir, currentVersion)
         print("OK")
 
     print ("> Checking libraries...")
-    for library in mcLibraries.values():
+    for library in list(mcLibraries.values()):
         if not MinecraftDiscovery.checkLibraryExists(dstDir, library):
-            print ("\tCopying library %s..."%library['name'].split(':')[1]),
+            print(("\tCopying library %s..."%library['name'].split(':')[1]), end=' ')
             copyLibrary(mcDir, dstDir, library)
             print ("OK")
 
     print ("> Checking Natives...")
-    for native, jarname in MinecraftDiscovery.getNatives(dstDir, mcLibraries).items():
+    for native, jarname in list(MinecraftDiscovery.getNatives(dstDir, mcLibraries).items()):
         if not MinecraftDiscovery.checkNativeExists(dstDir, native, currentVersion):
-            print ("\tExtracting native %s..."%native),
+            print(("\tExtracting native %s..."%native), end=' ')
             extractNative(dstDir, native, jarname, currentVersion)
             print ("OK")
 

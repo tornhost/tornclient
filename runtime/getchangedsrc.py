@@ -10,8 +10,8 @@ import sys
 import logging
 from optparse import OptionParser
 
-from commands import Commands, CLIENT, SERVER
-from mcp import getchangedsrc_side
+from .commands import Commands, CLIENT, SERVER
+from .mcp import getchangedsrc_side
 
 
 def main():

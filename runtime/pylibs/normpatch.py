@@ -39,7 +39,7 @@ def main():
         in_file = args[0]
         out_file = args[1]
     else:
-        print >> sys.stderr, 'src_file required'
+        print('src_file required', file=sys.stderr)
         sys.exit(1)
     normalisepatch(in_file, out_file)
 

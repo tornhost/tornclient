@@ -1,8 +1,32 @@
+# MCP runtime/build output
 bin/
 jars/
 temp/
 reobf/
 logs/
-*.bat
-*.sh
+dist/
+build/
+release/
+
+# Eclipse / IDE junk
 .metadata/
+.classpath
+.project
+.settings/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Config
+conf/*.csv
+conf/*.srg
+
+# Compiled files
+*.class
+
+# Crash logs
+crash-reports/
+
+# Local run configs
+run/

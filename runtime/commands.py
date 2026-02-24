@@ -15,27 +15,27 @@ import zipfile
 import csv
 import re
 import subprocess
-import ConfigParser
-import urllib
+import configparser
+import urllib.request, urllib.parse, urllib.error
 import time
 import stat
 import errno
 import shlex
 import platform
-import MinecraftDiscovery
+from . import MinecraftDiscovery
 from hashlib import md5  # pylint: disable-msg=E0611
 from contextlib import closing
 from textwrap import TextWrapper
 
-from filehandling.srgsexport import writesrgsfromcsvs
-from filehandling.srgshandler import parse_srg
-from pylibs.annotate_gl_constants import annotate_file
-from pylibs.whereis import whereis
-from pylibs.jadfix import jadfix
-from pylibs.fffix import fffix
-from pylibs.cleanup_src import strip_comments, src_cleanup
-from pylibs.normlines import normaliselines
-from pylibs.normpatch import normalisepatch
+from .filehandling.srgsexport import writesrgsfromcsvs
+from .filehandling.srgshandler import parse_srg
+from .pylibs.annotate_gl_constants import annotate_file
+from .pylibs.whereis import whereis
+from .pylibs.jadfix import jadfix
+from .pylibs.fffix import fffix
+from .pylibs.cleanup_src import strip_comments, src_cleanup
+from .pylibs.normlines import normaliselines
+from .pylibs.normpatch import normalisepatch
 
 CLIENT = 0
 SERVER = 1
@@ -48,7 +48,7 @@ class Error(Exception):
 
 class CalledProcessError(Error):
     def __init__(self, returncode, cmd, output=None):
-        super(CalledProcessError, self).__init__()
+        super().__init__()
         self.returncode = returncode
         self.cmd = cmd
         self.output = output
@@ -136,7 +136,7 @@ def truncate(text, length):
 def csv_header(csvfile):
     fieldnames = []
     if os.path.isfile(csvfile):
-        with open(csvfile, 'rb') as fh:
+        with open(csvfile, 'r', newline='') as fh:
             csvreader = csv.DictReader(fh)
             fieldnames = csvreader.fieldnames
     return set(fieldnames)
@@ -154,16 +154,16 @@ class Commands(object):
         """Read the version configuration file and return a full version string"""
         full_version = None
         try:
-            config = ConfigParser.SafeConfigParser()
+            config = configparser.ConfigParser()
             with open(os.path.normpath(cls._version_config)) as fh:
-                config.readfp(fh)
+                config.read_file(fh)
             data_version = config.get('VERSION', 'MCPVersion')
             client_version = config.get('VERSION', 'ClientVersion')
             server_version = config.get('VERSION', 'ServerVersion')
             full_version = ' (data: %s, client: %s, server: %s)' % (data_version, client_version, server_version)
         except IOError:
             pass
-        except ConfigParser.Error:
+        except configparser.Error:
             pass
 
         if full_version is None:
@@ -209,15 +209,15 @@ class Commands(object):
 
     def getVersions(self):
         try:
-            config = ConfigParser.SafeConfigParser()
+            config = configparser.ConfigParser()
             with open(os.path.normpath(self._version_config)) as fh:
-                config.readfp(fh)
+                config.read_file(fh)
             client_version = config.get('VERSION', 'ClientVersion')
             server_version = config.get('VERSION', 'ServerVersion')
             return client_version, server_version
         except IOError:
             pass
-        except ConfigParser.Error:
+        except configparser.Error:
             pass
 
         return None
@@ -433,10 +433,10 @@ class Commands(object):
 
     def readconf(self, workdir, json):
         """Read the configuration file to setup some basic paths"""
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.ConfigParser()
         try:
             with open(os.path.normpath(self._default_config)) as fh:
-                config.readfp(fh)
+                config.read_file(fh)
             if self.conffile is not None:
                 config.read(os.path.normpath(self.conffile))
         except IOError:
@@ -664,7 +664,7 @@ class Commands(object):
         if not len(configpathclient) == 1 or not configpathclient[0] == '':
             cpathclient.extend(configpathclient)
 
-        for library in self.mcLibraries.values():
+        for library in list(self.mcLibraries.values()):
             cpathclient.append(os.path.join(self.dirjars,library['filename']))
 
         self.cpathclient = [os.path.normpath(p) for p in cpathclient]
@@ -844,18 +844,18 @@ class Commands(object):
         results = []
         if self.osname == 'win':
             if not results:
-                import _winreg
+                import winreg
 
-                for flag in [_winreg.KEY_WOW64_64KEY, _winreg.KEY_WOW64_32KEY]:
+                for flag in [winreg.KEY_WOW64_64KEY, winreg.KEY_WOW64_32KEY]:
                     try:
-                        k = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r'Software\JavaSoft\Java Development Kit', 0,
-                                            _winreg.KEY_READ | flag)
-                        version, _ = _winreg.QueryValueEx(k, 'CurrentVersion')
+                        k = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r'Software\JavaSoft\Java Development Kit', 0,
+                                            winreg.KEY_READ | flag)
+                        version, _ = winreg.QueryValueEx(k, 'CurrentVersion')
                         k.Close()
-                        k = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE,
+                        k = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                                             r'Software\JavaSoft\Java Development Kit\%s' % version, 0,
-                                            _winreg.KEY_READ | flag)
-                        path, _ = _winreg.QueryValueEx(k, 'JavaHome')
+                                            winreg.KEY_READ | flag)
+                        path, _ = winreg.QueryValueEx(k, 'JavaHome')
                         k.Close()
                         path = os.path.join(str(path), 'bin')
                         self.runcmd('"%s" -version' % os.path.join(path, 'javac'), quiet=True)
@@ -1015,17 +1015,16 @@ class Commands(object):
             md5lcldict[cur_file] = (md5_file, os.stat(cur_file).st_mtime)
         try:
             update_url = self.updateurl + 'mcp.md5'
-            listfh = urllib.urlopen(update_url)
-            if listfh.getcode() != 200:
-                return []
-            md5srvlist = listfh.readlines()
+            with urllib.request.urlopen(update_url) as listfh:
+                if listfh.status != 200:
+                    return []
+                md5srvlist = listfh.read().decode('utf-8').splitlines()
             md5srvdict = {}
+            for entry in md5srvlist:
+                parts = entry.split()
+                md5srvdict[parts[0]] = (parts[1], float(parts[2]), parts[3])
         except IOError:
             return []
-
-        # HINT: Each remote entry is of the form dict[filename]=(md5,modificationtime,action)
-        for entry in md5srvlist:
-            md5srvdict[entry.split()[0]] = (entry.split()[1], float(entry.split()[2]), entry.split()[3])
 
         results = []
         for key, value in md5srvdict.items():
@@ -1268,13 +1267,13 @@ class Commands(object):
             if not k in meta['old']['access']:
                 return False
             return meta['old']['access'][k]['ops'] == value['ops']
-        access = [v for k,v in meta['new']['access'].items() if not filter_matched(k,v)]
+        access = [v for k,v in list(meta['new']['access'].items()) if not filter_matched(k,v)]
         
         mapped = {}
         unmapped = []
         for acc in access:
             matched = False
-            for k,v in meta['old']['access'].items():
+            for k,v in list(meta['old']['access'].items()):
                 if not v['owner'] == acc['owner'] or not v['desc'] == acc['desc'] or not v['ops'] == acc['ops']:
                     continue
                 matched = True
@@ -1340,7 +1339,7 @@ class Commands(object):
 
         extra = '-e="%s"' % self.ffserverextra
         if side == CLIENT:
-            extra = ' '.join(['"-e=%s"' % os.path.join(self.dirjars, p['filename']) for p in self.mcLibraries.values()])
+            extra = ' '.join(['"-e=%s"' % os.path.join(self.dirjars, p['filename']) for p in list(self.mcLibraries.values())])
         
         # HINT: We pass in the exec output jar, this skips the need to extract the jar, and copy classes to there own folder
         forkcmd = self.cmdfernflower.format(indir=ffinput[side], outdir=pathsrclk[side], extra=extra)
@@ -1540,7 +1539,7 @@ class Commands(object):
                 self.logger.warning('==================')
                 self.logger.warning('')
                 
-        for k,v in patches.items():
+        for k,v in list(patches.items()):
             apply_patchlist(v)
 
     def recompile(self, side):
@@ -1626,7 +1625,7 @@ class Commands(object):
         if not quiet:
             self.logger.debug("runcmd: '%s'", truncate(forkcmd, 500))
             self.logger.debug("shlex: %s", truncate(str(forklist), 500))
-        process = subprocess.Popen(forklist, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=-1)
+        process = subprocess.Popen(forklist, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=-1, universal_newlines=True)
         output, _ = process.communicate()
         if log_file is not None:
             with open(log_file, 'w') as log:
@@ -1647,7 +1646,7 @@ class Commands(object):
             self.logger.debug("runmc: '%s'", truncate(forkcmd, 500))
             self.logger.debug("shlex: %s", truncate(str(forklist), 500))
         output = ''
-        process = subprocess.Popen(forklist, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
+        process = subprocess.Popen(forklist, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
         while process.poll() is None:
             line = process.stdout.readline()
             if line:
@@ -1738,20 +1737,20 @@ class Commands(object):
 
         # HINT: We read the relevant CSVs
         names = {'methods': {}, 'fields': {}, 'params': {}}
-        with open(self.csvmethods, 'rb') as fh:
+        with open(self.csvmethods, 'r', newline='') as fh:
             methodsreader = csv.DictReader(fh)
             for row in methodsreader:
                 if int(row['side']) == side or int(row['side']) == 2:
                     if row['name'] != row['searge']:
                         names['methods'][row['searge']] = row['name']
-        with open(self.csvfields, 'rb') as fh:
+        with open(self.csvfields, 'r', newline='') as fh:
             fieldsreader = csv.DictReader(fh)
             for row in fieldsreader:
                 if int(row['side']) == side or int(row['side']) == 2:
                     if row['name'] != row['searge']:
                         names['fields'][row['searge']] = row['name']
         if self.has_param_csv:
-            with open(self.csvparams, 'rb') as fh:
+            with open(self.csvparams, 'r', newline='') as fh:
                 paramsreader = csv.DictReader(fh)
                 for row in paramsreader:
                     if int(row['side']) == side or int(row['side']) == 2:
@@ -1806,7 +1805,7 @@ class Commands(object):
 
         # HINT: We read the relevant CSVs
         mapping = {'methods': {}, 'fields': {}, 'params': {}}
-        with open(self.csvnewids, 'rb') as fh:
+        with open(self.csvnewids, 'r', newline='') as fh:
             in_csv = csv.DictReader(fh)
             for line in in_csv:
                 in_id = None
@@ -1835,7 +1834,7 @@ class Commands(object):
             tmp_file = src_file + '.tmp'
             with open(src_file, 'r') as fh:
                 buf = fh.read()
-            for group in mapping.keys():
+            for group in list(mapping.keys()):
                 def mapname(match):
                     try:
                         return mapping[group][match.group(0)]
@@ -2069,7 +2068,7 @@ class Commands(object):
             if self.fixsound:
                 ignore_classes.append(self.fixsound)
         trgclasses = []
-        for key in md5reobtable.keys():
+        for key in list(md5reobtable.keys()):
             if key in ignore_classes:
                 continue
             if key not in md5table:
@@ -2078,7 +2077,7 @@ class Commands(object):
                 mainname = os.path.basename(key).split('$')[0]
                 
                 # We recheck all the key to see if their main class is equivalent. If it is, we append the class to the marked classes
-                for subkey in md5reobtable.keys():
+                for subkey in list(md5reobtable.keys()):
                     subclassname = os.path.basename(subkey).split('$')[0]
                     if subclassname == mainname and not subkey in trgclasses:
                         trgclasses.append(subkey)
@@ -2089,7 +2088,7 @@ class Commands(object):
                 mainname = os.path.basename(key).split('$')[0]
                 
                 # We recheck all the key to see if their main class is equivalent. If it is, we append the class to the marked classes
-                for subkey in md5reobtable.keys():
+                for subkey in list(md5reobtable.keys()):
                     subclassname = os.path.basename(subkey).split('$')[0]
                     if subclassname == mainname and not subkey in trgclasses:
                         trgclasses.append(subkey)
@@ -2172,24 +2171,24 @@ class Commands(object):
                 self.logger.info('File tagged for deletion : %s', entry[0])
 
         if 'CHANGELOG' in [i[0] for i in newfiles]:
-            print ''
+            print('')
             self.logger.info('== CHANGELOG ==')
             changelog_url = self.updateurl + 'mcp/CHANGELOG'
-            changelog = urllib.urlopen(changelog_url).readlines()
+            changelog = urllib.request.urlopen(changelog_url).readlines()
             for line in changelog:
                 self.logger.info(line.strip())
                 if not line.strip():
                     break
-            print ''
-            print ''
+            print('')
+            print('')
 
         if not force:
-            print 'WARNING:'
-            print 'You are going to update MCP'
-            print 'Are you sure you want to continue ?'
-            answer = raw_input('If you really want to update, enter "Yes" ')
+            print('WARNING:')
+            print('You are going to update MCP')
+            print('Are you sure you want to continue ?')
+            answer = input('If you really want to update, enter "Yes" ')
             if answer.lower() not in ['yes', 'y']:
-                print 'You have not entered "Yes", aborting the update process'
+                print('You have not entered "Yes", aborting the update process')
                 sys.exit(1)
 
         for entry in newfiles:
@@ -2203,7 +2202,7 @@ class Commands(object):
                     except OSError:
                         pass
                 file_url = self.updateurl + 'mcp/' + entry[0]
-                urllib.urlretrieve(file_url, cur_file)
+                urllib.request.urlretrieve(file_url, cur_file)
             elif entry[3] == 'D':
                 self.logger.info('Removing file from local install : %s', entry[0])
                 # Remove file here
@@ -2228,13 +2227,13 @@ class Commands(object):
                 if len(row) == 2:
                     md5reobtable[row[0]] = row[1]
         trgclasses = []
-        for key in md5reobtable.keys():
+        for key in list(md5reobtable.keys()):
             if key not in md5table:
                 # We get the classname by splitting the path first than splitting on '$'
                 mainname = os.path.basename(key).split('$')[0]
                 
                 # We recheck all the key to see if their main class is equivalent. If it is, we append the class to the marked classes
-                for subkey in md5reobtable.keys():
+                for subkey in list(md5reobtable.keys()):
                     subclassname = os.path.basename(subkey).split('$')[0]
                     if subclassname == mainname and not subkey in trgclasses:
                         trgclasses.append(subkey)
@@ -2244,7 +2243,7 @@ class Commands(object):
                 mainname = os.path.basename(key).split('$')[0]
                 
                 # We recheck all the key to see if their main class is equivalent. If it is, we append the class to the marked classes
-                for subkey in md5reobtable.keys():
+                for subkey in list(md5reobtable.keys()):
                     subclassname = os.path.basename(subkey).split('$')[0]
                     if subclassname == mainname and not subkey in trgclasses:
                         trgclasses.append(subkey)
@@ -2287,9 +2286,9 @@ class Commands(object):
             reob = self.loadsrg(reobsrg[side], reverse=False)
             out = {'CL:': {}, 'MD:': {}, 'FD:': {}, 'PK:': {}}
             
-            for type,de in deob.items():
+            for type,de in list(deob.items()):
                 re = reob[type]
-                out[type] = dict([[k,re[v]] for k,v in de.items()])
+                out[type] = dict([[k,re[v]] for k,v in list(de.items())])
             
             if os.path.isfile(targsrg[side]):
                 os.remove(targsrg[side])
@@ -2319,6 +2318,6 @@ class Commands(object):
                 assert 'Unknown type %s' % line
 
         if reverse:
-            for type,map in srg.items():
-                srg[type] = dict([[v,k] for k,v in map.items()])
+            for type,map in list(srg.items()):
+                srg[type] = dict([[v,k] for k,v in list(map.items())])
         return srg

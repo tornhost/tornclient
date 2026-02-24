@@ -10,7 +10,7 @@ import sys
 import logging
 from optparse import OptionParser
 
-from commands import Commands
+from .commands import Commands
 
 
 def main():

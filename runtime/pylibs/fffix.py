@@ -193,7 +193,7 @@ def fffix_zip_dir(src_file, dest_dir):
         for info in zip.filelist:
             data = zip.read(info.filename)
             if info.filename.endswith('.java'):
-                print(info.filename)
+                print((info.filename))
                 data = _process_data(data, os.path.splitext(os.path.basename(info.filename))[0])
             else:
               continue
@@ -382,7 +382,7 @@ def main():
     elif len(args) == 2:
         fffix_zip_dir(args[0], args[1])
     else:
-        print >> sys.stderr, 'src_dir required'
+        print('src_dir required', file=sys.stderr)
         sys.exit(1)
 
 def rmtree_filter(path, whitelist):
@@ -390,7 +390,7 @@ def rmtree_filter(path, whitelist):
       for file in files:
           tmp = os.path.join(root, file).replace('\\', '/')
           if not tmp in whitelist:
-              print 'Removing: ' + tmp
+              print('Removing: ' + tmp)
               os.remove(tmp)
       
       for dir in dirs:

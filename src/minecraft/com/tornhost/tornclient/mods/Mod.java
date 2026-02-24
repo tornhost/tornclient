@@ -36,6 +36,11 @@ public class Mod {
 		// We will register this to our Event System later
 	}
 	
+	// What happens every single tick (20 times a second)
+	public void onUpdate() {
+		// Empty by default. Mods will override this if they need to.
+	}
+	
 	// Getters and Setters
 	public String getName() { return name; }
 	public String getDescription() { return description; }

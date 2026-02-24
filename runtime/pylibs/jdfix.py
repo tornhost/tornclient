@@ -60,7 +60,7 @@ def main():
     parser = OptionParser(version=version, usage=usage)
     options, args = parser.parse_args()
     if len(args) != 1:
-        print >> sys.stderr, 'src_dir required'
+        print('src_dir required', file=sys.stderr)
         sys.exit(1)
     jdfix(args[0])
 
