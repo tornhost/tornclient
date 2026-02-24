@@ -899,6 +899,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
             this.horseJumpPower = 0.0F;
         }
         
+        // Client heartbeat
+        com.tornhost.tornclient.Client.getInstance().modManager.update();
+        
         super.onLivingUpdate(); // Vanilla code
 
         if (this.onGround && this.capabilities.isFlying && !this.mc.playerController.isSpectatorMode())

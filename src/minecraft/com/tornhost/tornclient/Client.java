@@ -12,10 +12,14 @@ public class Client {
 	public final String version = "1.0.0";
 	public final String author = "atticl";
 	
+	public ModManager modManager;
+	
 	// Run when game starts
 	public void startup() {
 		System.out.println("=======================================");
         System.out.println("Starting " + name + " v" + version + " by " + author);
-        System.out.println("=======================================");       
+        System.out.println("=======================================");
+        
+        modManager = new ModManager();
 	}
 }
