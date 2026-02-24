@@ -4,6 +4,9 @@ jars/
 temp/
 reobf/
 logs/
+dist/
+build/
+release/
 
 # Eclipse / IDE junk
 .metadata/
@@ -14,6 +17,10 @@ logs/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Config
+conf/*.csv
+conf/*.srg
 
 # Compiled files
 *.class
