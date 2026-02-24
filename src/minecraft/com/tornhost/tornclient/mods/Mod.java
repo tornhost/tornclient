@@ -10,6 +10,8 @@ public class Mod {
 	private String description;
 	private boolean enabled = false;
 	
+	public float sliderX = 0.0F;
+	
 	public Mod (String name, String description) {
 		this.name = name;
 		this.description = description;

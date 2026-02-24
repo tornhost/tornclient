@@ -1914,10 +1914,15 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 if (Keyboard.getEventKeyState())
                 {
                 	
-                	// Custom gui
-                	if (Keyboard.getEventKey() == Keyboard.KEY_RSHIFT) {
-                		this.displayGuiScreen(new com.tornhost.tornclient.ui.ClickGUI());
-                	}
+                	// RIGHT_SHIFT opens Dashboard
+                	if (k == org.lwjgl.input.Keyboard.KEY_RSHIFT) {
+                        this.displayGuiScreen(new com.tornhost.tornclient.ui.ClickGUI());
+                    }
+                	
+                	// RIGHT_CTRL opens editor
+                	if (k == org.lwjgl.input.Keyboard.KEY_RCONTROL) {
+                        this.displayGuiScreen(new com.tornhost.tornclient.ui.HUDEditor());
+                    }
                 	
                     if (k == 62 && this.entityRenderer != null) // Vanilla code
                     {
