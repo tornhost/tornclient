@@ -19,7 +19,7 @@ def parse_srg(srg_filename):
                    'MD': []}
 
     def get_parsed_line(keyword, buf):
-        return dict(list(zip(srg_types[keyword], [i.strip() for i in buf])))
+        return dict(zip(srg_types[keyword], [i.strip() for i in buf]))
 
     with open(srg_filename, 'r') as srg_file:
         for buf in srg_file:

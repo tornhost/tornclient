@@ -285,7 +285,7 @@ def main():
                       help='round long float and double constants', default=False)
     options, args = parser.parse_args()
     if len(args) != 1:
-        print('src_dir required', file=sys.stderr)
+        print >> sys.stderr, 'src_dir required'
         sys.exit(1)
     cleanup_src(args[0], clean_comments=options.clean_comments, clean_src=options.clean_src,
                 fix_imports=options.fix_imports, fix_unicode=options.fix_unicode, fix_charval=options.fix_charval,

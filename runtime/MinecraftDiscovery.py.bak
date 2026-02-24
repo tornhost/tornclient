@@ -12,7 +12,7 @@ def getMinecraftPath():
     elif sys.platform.startswith('darwin'):
         return os.path.expanduser("~/Library/Application Support/minecraft")
     else:
-        print("Cannot detect of version : %s. Please report to your closest sysadmin"%sys.platform)
+        print "Cannot detect of version : %s. Please report to your closest sysadmin"%sys.platform
         sys.exit()
 
 def getNativesKeyword():
@@ -23,7 +23,7 @@ def getNativesKeyword():
     elif sys.platform.startswith('darwin'):
         return "osx"
     else:
-        print("Cannot detect of version : %s. Please report to your closest sysadmin"%sys.platform)
+        print "Cannot detect of version : %s. Please report to your closest sysadmin"%sys.platform
         sys.exit()        
 
 def checkMCDir(src, version):
@@ -44,7 +44,7 @@ def checkCacheIntegrity(root, jsonfile, osKeyword, version):
     if libraries == None:
         return False
 
-    for library in list(libraries.values()):
+    for library in libraries.values():
         if not checkLibraryExists(root, library):
             return False
 
@@ -53,7 +53,7 @@ def checkCacheIntegrity(root, jsonfile, osKeyword, version):
 
     natives = getNatives(root, libraries)
 
-    for native in list(natives.keys()):
+    for native in natives.keys():
         if not checkNativeExists(root, native, version):
             return False
 
@@ -81,7 +81,7 @@ def checkNativeExists(root, native, version):
 
 def getNatives(root, libraries):
     nativeList = {}
-    for library in list(libraries.values()):
+    for library in libraries.values():
         if library['extract']:
 
             srcPath = os.path.join(root, library['filename'])
@@ -113,7 +113,7 @@ def getLibraries(root, jsonfile, osKeyword):
     try:
         jsonFile = json.load(open(jsonfile))
     except Exception as e:
-        print("Error while parsing the library JSON file : %s"%e)
+        print "Error while parsing the library JSON file : %s"%e
         sys.exit()
     
     mcLibraries  = jsonFile['libraries']
@@ -192,9 +192,9 @@ if __name__ == '__main__':
     mcLibraries = getLibraries(mcDir, getJSONFilename(mcDir, "1.6.1"), osKeyword)
     mcNatives = getNatives(mcDir, mcLibraries)
 
-    for native in list(mcNatives.keys()):
+    for native in mcNatives.keys():
         if checkNativeExists("./jars", native, "1.6.1"):
-            print('Found %s %s'%(native, mcNatives[native]))
+            print 'Found %s %s'%(native, mcNatives[native])
         else:
-            print('Not found %s %s'%(native, mcNatives[native]))
+            print 'Not found %s %s'%(native, mcNatives[native])
             

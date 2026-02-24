@@ -10,8 +10,8 @@ import sys
 import logging
 from optparse import OptionParser
 
-from commands import Commands, CLIENT, SERVER, CalledProcessError
-from mcp import reformat_side
+from .commands import Commands, CLIENT, SERVER, CalledProcessError
+from .mcp import reformat_side
 
 
 def main():

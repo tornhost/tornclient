@@ -12,7 +12,7 @@ import glob
 import logging
 from optparse import OptionParser
 
-from .commands import Commands, reallyrmtree
+from commands import Commands, reallyrmtree
 
 
 def main():
@@ -29,13 +29,13 @@ def cleanup(conffile, force, distclean):
         commands = Commands(conffile, shortstart=True)
 
         if not force:
-            print('WARNING:')
-            print('The cleanup script will delete all folders created by MCP, including the')
-            print('src folder which may contain changes you made to the code, along with any')
-            print('saved worlds from the client or server.')
-            answer = input('If you really want to clean up, enter "Yes" ')
+            print 'WARNING:'
+            print 'The cleanup script will delete all folders created by MCP, including the'
+            print 'src folder which may contain changes you made to the code, along with any'
+            print 'saved worlds from the client or server.'
+            answer = raw_input('If you really want to clean up, enter "Yes" ')
             if answer.lower() not in ['yes']:
-                print('You have not entered "Yes", aborting the clean up process')
+                print 'You have not entered "Yes", aborting the clean up process'
                 sys.exit(1)
 
         commands.checkupdates()
@@ -76,9 +76,9 @@ def cleanup(conffile, force, distclean):
             logging.shutdown()
             reallyrmtree(commands.dirlogs)
         except OSError as ex:
-            print('Cleanup FAILED', file=sys.stderr)
+            print >> sys.stderr, 'Cleanup FAILED'
             if hasattr(ex, 'filename'):
-                print('Failed to remove ' + ex.filename, file=sys.stderr)
+                print >> sys.stderr, 'Failed to remove ' + ex.filename
             sys.exit(1)
     except Exception:  # pylint: disable-msg=W0703
         logging.exception('FATAL ERROR')

@@ -8,7 +8,7 @@ Created on Thu Jan  19 15:04:52 2012
 
 import time
 
-from .commands import CLIENT, SIDE_NAME
+from commands import CLIENT, SIDE_NAME
 
 
 def decompile_side(commands, side, use_ff=False, use_srg=False, no_comments=False, no_reformat=False, no_renamer=False,

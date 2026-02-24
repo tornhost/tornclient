@@ -10,8 +10,8 @@ import sys
 import logging
 from optparse import OptionParser
 
-from .commands import Commands, CLIENT, SERVER, CalledProcessError
-from .mcp import updatemd5_side
+from commands import Commands, CLIENT, SERVER, CalledProcessError
+from mcp import updatemd5_side
 
 
 def main():
@@ -38,17 +38,17 @@ def updatemd5(conffile, force, only_client, only_server):
 
         if ((process_client and commands.checkmd5s(CLIENT) or process_server and commands.checkmd5s(SERVER))
                 and not force):
-            print('WARNING:')
-            print('The updatemd5 script is unsupported and should only be run in special')
-            print('cases, such as if there were compile errors in the last decompile which')
-            print('have now been corrected. It will reset the changed status of all classes')
-            print('for reobfuscation, and only classes modified afterwards will end up in')
-            print('the reobf directory.')
-            print('Only use this script if you absolutely know what you are doing, or when a')
-            print('MCP team member asks you to do so.')
-            answer = input('If you really want to update all classes, enter "Yes" ')
+            print 'WARNING:'
+            print 'The updatemd5 script is unsupported and should only be run in special'
+            print 'cases, such as if there were compile errors in the last decompile which'
+            print 'have now been corrected. It will reset the changed status of all classes'
+            print 'for reobfuscation, and only classes modified afterwards will end up in'
+            print 'the reobf directory.'
+            print 'Only use this script if you absolutely know what you are doing, or when a'
+            print 'MCP team member asks you to do so.'
+            answer = raw_input('If you really want to update all classes, enter "Yes" ')
             if answer.lower() not in ['yes']:
-                print('You have not entered "Yes", aborting the update process')
+                print 'You have not entered "Yes", aborting the update process'
                 sys.exit(1)
 
         if process_client:
